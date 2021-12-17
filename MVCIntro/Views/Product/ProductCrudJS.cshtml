@@ -1,0 +1,202 @@
+﻿
+@{
+    ViewData["Title"] = "ProductCrudJS";
+}
+@model ProductViewModel
+
+<h1>ProductCrudJS</h1>
+
+
+<div>@ViewData["Message"]</div>
+
+<div>@TempData["Message"]</div>
+
+
+
+
+
+
+
+    <table border="1" style="width:100%; border-collapse:collapse">
+        <thead>
+            <tr>
+                <th>Ürün adı</th>
+                <th>Fiyatı</th>
+                <th>Stoğu</th>
+            </tr>
+
+        </thead>
+        @foreach (var item in Model.Products)
+        {
+            <tr id="select-row_@item.Id">
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.Price
+                </td>
+                <td>
+                    @item.Stock
+                </td>
+                <td id="select-action_@item.Id">
+                    <button onclick="Select('@item.Id')">Seç</button>
+                </td>
+                <td>
+                    <button onclick="Delete('@item.Id')">Sil</button>
+                </td>
+            </tr>
+        }
+    </table>
+
+
+
+
+<button onclick="NewRecord()">
+    (+) Yeni Kayıt
+</button>
+
+
+
+
+    <form name="CreateForm" id="CreateForm" style="display:none" method="post" onsubmit="Create(event)">
+        <input  type="text" name="name" placeholder="Ürün Adı" />
+        <input  type="text" name="price" placeholder="Ürün fiyatı" />
+        <input  type="text" name="stock" placeholder="Ürün Stoğu" />
+        <input type="submit" value="Ekle" />
+    </form>
+
+    <form name="EditForm" id="EditForm"  style="display:none" method="post" onsubmit="Update()">
+        <input  type="text" name="name" placeholder="Ürün Adı" />
+        <input  type="text" name="price" placeholder="Ürün fiyatı" />
+        <input  type="text" name="stock" placeholder="Ürün Stoğu" />
+        <input type="submit" value="Güncelle" />
+    </form>
+
+
+deneme
+
+
+@section Scripts {
+
+    <script>
+
+
+    let lastSelectedId = null;
+
+        const Select = (id) => {
+
+            hideElement('CreateForm');
+
+        const selectedTd = document.getElementById(`select-action_${id}`);
+        selectedTd.style.backgroundColor = "yellow";
+
+        // ilk adım için kontrol dom da nesne bulamaz ise bu kod çalışmaz
+        if (lastSelectedId != null) {
+            const coloredTd = document.getElementById(`select-action_${lastSelectedId}`);
+            coloredTd.style.backgroundColor = "white";
+        }
+
+
+        // Edit Formu gösteririz.
+
+        if (lastSelectedId == id) {
+            const editForm = document.getElementById('EditForm');
+            editForm.style.display = "none";
+            // seçimden kaldırınca lastIndex sıfılarki bir daha seçilebilsin
+            lastSelectedId = null;
+        } else {
+            const editForm = document.getElementById('EditForm');
+            editForm.style.display = "block";
+            lastSelectedId = id;
+
+            const selectedTr = document.getElementById(`select-row_${id}`);
+
+            const firstElement = selectedTr.querySelector("td:first-child");
+            const name = firstElement.textContent;
+
+
+            const secondElement = selectedTr.querySelector("td:nth-child(2)");
+            const price = secondElement.textContent;
+
+
+            const lastElement = selectedTr.querySelector("td:nth-child(3)");
+            const stock = lastElement.textContent;
+
+            console.log('n', name, 'pr', price, 'st', stock);
+
+            EditForm.name.value = name.trim();
+            EditForm.price.value = price.trim();
+            EditForm.stock.value = stock.trim();
+
+        }
+
+
+
+
+
+
+
+
+
+    }
+
+        const hideElement = (elementId) => {
+            const element = document.getElementById(elementId);
+            element.style.display = "none";
+        }
+
+
+        const showElement = (elementId) => {
+            const element = document.getElementById(elementId);
+            element.style.display = "block";
+        }
+
+        const NewRecord = () => {
+            hideElement('EditForm');
+            showElement('CreateForm');
+        }
+
+        const Create = (event) => {
+
+            event.preventDefault();
+
+            const param = {
+                name: CreateForm.name.value,
+                price: CreateForm.price.value,
+                stock: CreateForm.stock.value
+            };
+
+            console.log('param', param);
+
+            fetch('/Product/CreateJson',
+                {
+                    method: 'POST',
+                    body: JSON.stringify(param),
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        RequestVerificationToken:
+                            $('input:hidden[name="__RequestVerificationToken"]').val()
+                    }
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) { console.log('product', data) })
+                .catch(function (err) {
+                    console.log('err', err);
+                })
+
+
+        }
+
+    </script>
+
+
+
+}
+
+
+
+
+
+
+

@@ -1,0 +1,100 @@
+﻿
+@{
+    ViewData["Title"] = "ProductCrud";
+}
+
+@model ProductViewModel
+
+
+<h1>ProductCrud</h1>
+
+
+<div>@ViewData["Message"]</div>
+
+<div>@TempData["Message"]</div>
+
+
+
+
+
+<form method="post" action="Delete">
+
+
+    <table border="1" style="width:100%; border-collapse:collapse">
+        <thead>
+            <tr>
+                <th>Ürün adı</th>
+                <th>Fiyatı</th>
+                <th>Stoğu</th>
+            </tr>
+
+        </thead>
+        @foreach (var item in Model.Products)
+        {
+            <tr>
+                <td>
+                    @item.Name
+                </td>
+                <td>
+                    @item.Price
+                </td>
+                <td>
+                    @item.Stock
+                </td>
+                @* dinamik olarak htmlde kontrol sağlama şeklimiz için @() kullanın *@
+                <td style='background-color:@(
+(bool)ViewData["editButtonClick"] == true &&
+(string)ViewData["ClickId"] == item.Id
+? "yellow" : "gray")'>
+
+
+
+                    <a asp-controller="Product" asp-action="ProductCrud" asp-route-addButtonClick="false" asp-route-editButtonClick="true" asp-route-clickId="@item.Id">Seç</a>
+                </td>
+                <td>
+                    @*<a href="javascript:void()" onclick="document.getElementById('submit').click()">Sil</a>*@
+                    <input type="hidden" asp-for="DeleteId" value="@item.Id" />
+                    <input id="submit" type="submit" asp-for="DeleteId" value="Sil" />
+                </td>
+            </tr>
+        }
+    </table>
+
+</form>
+
+
+
+<a asp-controller="Product" asp-action="ProductCrud" asp-route-addButtonClick="true" asp-route-editButtonClick="false"> (+) Yeni Kayıt</a>
+
+
+
+
+
+
+@if ((bool)ViewData["addButtonClick"] == true)
+{
+
+    <form method="post" action="Create">
+        <input asp-for="Input.Name" type="text" name="Name" placeholder="Ürün Adı" />
+        <input asp-for="Input.Price" type="text" name="Price" placeholder="Ürün fiyatı" />
+        <input asp-for="Input.Stock" type="text" name="Stock" placeholder="Ürün Stoğu" />
+        <input type="submit" value="Ekle" />
+    </form>
+}
+
+
+
+@if ((bool)ViewData["editButtonClick"] == true)
+{
+    <form method="post" action="Update">
+        <input asp-for="Input.Name" type="text" name="Name" placeholder="Ürün Adı" />
+        <input asp-for="Input.Price" type="text" name="Price" placeholder="Ürün fiyatı" />
+        <input asp-for="Input.Stock" type="text" name="Stock" placeholder="Ürün Stoğu" />
+        <input type="submit" value="Güncelle" />
+    </form>
+}
+
+
+
+
+
