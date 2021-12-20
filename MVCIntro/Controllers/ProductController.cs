@@ -200,5 +200,14 @@ namespace MVCIntro.Controllers
         {
             return Json(model);
         }
+
+
+        [HttpPost]
+        public JsonResult DeleteJSON([FromBody] string activeId)
+        {
+           
+            // dbden sil
+            return Json("OK");
+        }
     }
 }

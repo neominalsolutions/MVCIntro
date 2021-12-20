@@ -12,11 +12,6 @@
 <div>@TempData["Message"]</div>
 
 
-
-
-
-
-
     <table border="1" style="width:100%; border-collapse:collapse">
         <thead>
             <tr>
@@ -73,8 +68,6 @@
     </form>
 
 
-deneme
-
 
 @section Scripts {
 
@@ -83,11 +76,11 @@ deneme
 
     let lastSelectedId = null;
 
-        const Select = (id) => {
+        const Select = (activeId) => {
 
             hideElement('CreateForm');
 
-        const selectedTd = document.getElementById(`select-action_${id}`);
+            const selectedTd = document.getElementById(`select-action_${activeId}`);
         selectedTd.style.backgroundColor = "yellow";
 
         // ilk adım için kontrol dom da nesne bulamaz ise bu kod çalışmaz
@@ -95,11 +88,11 @@ deneme
             const coloredTd = document.getElementById(`select-action_${lastSelectedId}`);
             coloredTd.style.backgroundColor = "white";
         }
-
+        
 
         // Edit Formu gösteririz.
 
-        if (lastSelectedId == id) {
+        if (lastSelectedId == activeId) {
             const editForm = document.getElementById('EditForm');
             editForm.style.display = "none";
             // seçimden kaldırınca lastIndex sıfılarki bir daha seçilebilsin
@@ -107,9 +100,9 @@ deneme
         } else {
             const editForm = document.getElementById('EditForm');
             editForm.style.display = "block";
-            lastSelectedId = id;
+            lastSelectedId = activeId;
 
-            const selectedTr = document.getElementById(`select-row_${id}`);
+            const selectedTr = document.getElementById(`select-row_${activeId}`);
 
             const firstElement = selectedTr.querySelector("td:first-child");
             const name = firstElement.textContent;
@@ -127,16 +120,7 @@ deneme
             EditForm.name.value = name.trim();
             EditForm.price.value = price.trim();
             EditForm.stock.value = stock.trim();
-
         }
-
-
-
-
-
-
-
-
 
     }
 
@@ -145,6 +129,10 @@ deneme
             element.style.display = "none";
         }
 
+        const removeElement = (elementId) => {
+            const element = document.getElementById(elementId);
+            element.remove();
+        }
 
         const showElement = (elementId) => {
             const element = document.getElementById(elementId);
@@ -186,6 +174,45 @@ deneme
                 })
 
 
+        }
+
+
+        const Delete = (activeId) => {
+
+            const result = confirm('Kaydı silmek istediğinize emin misiniz');
+
+            if (result) {
+        
+
+
+                fetch('/Product/DeleteJSON',
+                    {
+                        method: 'POST',
+                        body: JSON.stringify(activeId),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            RequestVerificationToken:
+                                $('input:hidden[name="__RequestVerificationToken"]').val()
+                        }
+                    })
+                    .then(function (res) { return res.json(); })
+                    .then(function (data) {
+
+                        // veri tabanından silindiğine eminiz
+
+                        if (data == "OK") {
+                            removeElement(`select-row_${activeId}`);
+                        }
+
+                    })
+                    .catch(function (err) {
+                        console.log('err', err);
+                    })
+
+            }
+
+            
         }
 
     </script>
